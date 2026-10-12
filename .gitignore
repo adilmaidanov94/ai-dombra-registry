@@ -1,0 +1,20 @@
+# виртуальное окружение и кэш Python
+.venv/
+__pycache__/
+*.pyc
+
+# база и файлы реестра (db.sqlite3, media/) хранятся в репозитории (приватный);
+# временные файлы SQLite и резервные копии — нет
+db.sqlite3-journal
+db.sqlite3.bak*
+
+# macOS
+.DS_Store
+
+# токен Telegram-бота и другие секреты
+.env
+
+# записи домбры: большие звуковые файлы в репозиторий не попадают, протокол остаётся
+recordings/*
+!recordings/PROTOCOL*.md
+!recordings/PROTOCOL*.pdf
