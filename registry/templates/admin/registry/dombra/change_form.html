@@ -1,0 +1,61 @@
+{% extends "admin/change_form.html" %}
+{# Страница домбры: сверху добавлена панель со статусом, проверкой цепочки и кнопками действий. #}
+
+{% block extrastyle %}{{ block.super }}
+<style>
+  .registry-panel { border: 1px solid var(--hairline-color); border-radius: 6px; padding: 14px 16px; margin: 0 0 20px; background: var(--darkened-bg); }
+  .registry-panel__row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .registry-panel__row:last-child { margin-bottom: 0; }
+  .registry-panel__number { font-size: 1.15rem; font-weight: 600; }
+  .registry-panel__ok { color: var(--message-success-fg, #15803d); font-weight: 600; }
+  .registry-panel__bad { color: var(--error-fg, #ba2121); font-weight: 600; }
+  .registry-panel ul { margin: 4px 0 0 18px; padding: 0; }
+  .registry-panel ul li { list-style: disc; color: var(--error-fg, #ba2121); }
+  .registry-panel a.button { padding: 8px 14px; text-decoration: none; }
+  .registry-panel a.button.registry-secondary { background: var(--close-button-bg, #747474); }
+  .registry-panel__hint { color: var(--body-quiet-color); font-size: 0.8125rem; }
+  /* Таблица документов должна помещаться по ширине без прокрутки. */
+  #documents-group td.field-title input { width: 12em; }
+  #documents-group td.field-file { max-width: 17em; overflow-wrap: anywhere; }
+  #documents-group td.field-doc_type select { max-width: 13em; }
+</style>
+{% endblock %}
+
+{% block form_top %}{{ block.super }}
+{% if original %}
+<div class="registry-panel">
+  <div class="registry-panel__row">
+    <span class="registry-panel__number">{{ original.registration_number|default:"Черновик" }}</span>
+    {{ registry_status_badge }}
+  </div>
+
+  {% if original.is_draft %}
+  <div class="registry-panel__row registry-panel__hint">
+    Черновик можно свободно редактировать и удалять. История событий и защита записей начинаются с регистрации.
+  </div>
+  {% elif registry_check %}
+  <div class="registry-panel__row">
+    {% if registry_check.ok %}
+      <span class="registry-panel__ok">✔ Цепочка событий цела</span>
+      <span class="registry-panel__hint">событий: {{ registry_check.events_checked }}, документов: {{ registry_check.documents_checked }}. Сами файлы здесь не пересчитываются:</span>
+    {% else %}
+      <div>
+        <span class="registry-panel__bad">✖ Нарушена целостность записей</span>
+        <ul>{% for problem in registry_check.problems %}<li>{{ problem }}</li>{% endfor %}</ul>
+      </div>
+    {% endif %}
+    <a href="{{ registry_verify_url }}">Полная проверка с пересчётом файлов</a>
+  </div>
+  {% endif %}
+
+  {% if registry_actions %}
+  <div class="registry-panel__row">
+    {% for action in registry_actions %}
+      <a class="button{% if not action.primary %} registry-secondary{% endif %}" href="{{ action.url }}">{{ action.label }}</a>
+    {% endfor %}
+  </div>
+  <div class="registry-panel__hint">Перед действием сохраните изменения в форме: несохранённые правки будут потеряны.</div>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

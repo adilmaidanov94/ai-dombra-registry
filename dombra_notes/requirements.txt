@@ -1,0 +1,5 @@
+# Распознавание нот
+numpy>=2.3
+soundfile>=0.13
+# Только для Telegram-бота
+python-telegram-bot>=22,<23
